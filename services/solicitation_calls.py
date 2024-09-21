@@ -14,11 +14,11 @@ def get_solicitation_actions(amazonOrderId, marketplaceId):
         'Authorization': f'Bearer {settings.ACCESS_TOKEN}',
         'Content-Type': 'application/json'
     }
-
-    response = requests.get(f'https://sellingpartnerapi-na.amazon.com/solicitations/v1/orders/{amazonOrderId}?marketplaceIds={marketplaceId}', 
+    
+    try:
+        response = requests.get(f'https://sellingpartnerapi-na.amazon.com/solicitations/v1/orders/{amazonOrderId}?marketplaceIds={marketplaceId}', 
                             headers = headers)
 
-    try:
         if response.status_code == 200:
             return response.json()
         else:

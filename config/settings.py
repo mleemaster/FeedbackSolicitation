@@ -119,6 +119,7 @@ def get_destination_id(token):
 # creates a notification subscription for Order Status Changes
 #
 # Not setup for reuse at the moment
+# Note: Has my personal DestinationId
 def create_order_change_subscription(access_token):
     url = "https://sellingpartnerapi-na.amazon.com/notifications/v1/subscriptions/ORDER_CHANGE"
     headers = {

@@ -42,11 +42,8 @@ def poll_messages(count):
             delete_message(message)
             mark_noti_processed(notificationId)
             print('Order not marked as shipped - deleted and processed.')
-        elif not is_noti_duplicate(notificationId):
-            process_message(body)
-            delete_message(message) 
-            mark_noti_processed(notificationId)
-
+        elif not is_noti_duplicate(notificationId): # implies this is a shipped notification
+            process_message(message, notificationId)
     else:
         print('No messages received. Quitting...')
         exit()
@@ -55,8 +52,9 @@ def poll_messages(count):
 # if an order meets the necessary criteria for solicitation
 #
 # method is void
-def process_message(body):
+def process_message(message, notificationId):
     print('Processing message...')
+    body = json.loads(message['Body'])
     marketplaceId = body.get('Payload').get('OrderChangeNotification').get('Summary').get('MarketplaceId')
     amazonOrderId = body.get('Payload').get('OrderChangeNotification').get('AmazonOrderId')
     earliestDeliveryDate = body.get('Payload').get('OrderChangeNotification').get('Summary').get('EarliestDeliveryDate')
@@ -67,11 +65,14 @@ def process_message(body):
         latestDeliveryDate = get_purchase_date(body, 7)
 
     if check_solicitation_window(earliestDeliveryDate, latestDeliveryDate):
+        print('IN SOLICITATION WINDOW, getting actions...')
         response = get_solicitation_actions(amazonOrderId, marketplaceId)
         if response['_links']['actions']:
             create_product_review_solicitation(amazonOrderId, marketplaceId)
+            delete_message(message)
+            mark_noti_processed(notificationId=notificationId)
     else: 
-        print('solicitation not available, deleting and marking message as processed...')    
+        print('Solicitation not available, leaving notification in queue...')    
 
 
 def mark_noti_processed(notificationId):
@@ -99,7 +100,7 @@ def shipped(body):
     print('Checking order status...')
     order_status = body.get('Payload').get('OrderChangeNotification').get('Summary').get('OrderStatus')
     
-    if order_status == 'Pending' or order_status == 'Unshipped':
+    if order_status != 'Shipped':
         return False
     else:
         return True

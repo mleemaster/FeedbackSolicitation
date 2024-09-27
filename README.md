@@ -1,6 +1,6 @@
 # FeedbackSolicitation
 This program is written in Python. It uses the 'Amazon SP-API' to allow 3rd-party Amazon sellers to automatically solicit feedback and product reviews from customers.
-It can be used to create an AWS Simple Queue Service, subsribe to ORDER_CHANGE notifications, process those notifications (handles duplicate notifications using a 
+It can be used to create an AWS Simple Queue Service, subscribe to ORDER_CHANGE notifications, process those notifications (handles duplicate notifications using a 
 DynamoDB table), and send customers product review and feedback solicitations if their order is within the valid solicitation window--5 days after Earliest Delivery Date
 to 30 days after the Latest Delivery Date.
 
